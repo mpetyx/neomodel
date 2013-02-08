@@ -17,13 +17,14 @@ def _dir_2_str(direction):
         return 'either'
 
 
-def _related(direction):
+def _related(direction, optional=False):
+    extra = '?' if optional else ''
     if direction == OUTGOING:
-        return '-[:{0}]->'
+        return '-[' + extra + ':{0}]->'
     elif direction == INCOMING:
-        return '<-[:{0}]-'
+        return '<-[' + extra + ':{0}]-'
     else:
-        return '-[:{0}]-'
+        return '-[' + extra + ':{0}]-'
 
 
 def _properties(ident, **kwargs):
@@ -130,7 +131,7 @@ class RelationshipManager(object):
     def _search_multi_class(self, **kwargs):
         cat_types = "|".join([camel_to_upper(c.__name__) for c in self.node_classes])
         query = "START a=node({self}) MATCH (a)"
-        query += _related(self.direction).format(self.relation_type)
+        query += _related(self.direction, optional=True).format(self.relation_type)
         query += "(b)<-[r:{0}]-() ".format(cat_types)
         query += "WHERE r.__instance__! = true AND " + _properties('b', **kwargs)
         query += " RETURN b, r"
